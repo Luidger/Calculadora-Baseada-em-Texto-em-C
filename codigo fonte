@@ -1,1 +1,129 @@
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+ 
+#define TAM 100
+ 
+void exibir_menu(void) {
+    printf("\n===============================\n");
+    printf("   Calculadora Simples\n");
+    printf("===============================\n");
+    printf("Selecione uma operação:\n");
+    printf("1. Adição\n");
+    printf("2. Subtração\n");
+    printf("3. Multiplicação\n");
+    printf("4. Divisão\n");
+    printf("5. Sair\n");
+}
+ 
+/* Lê a opção do menu e só retorna quando for um inteiro entre 1 e 5. */
+int ler_opcao(void) {
+    char linha[TAM];
+ 
+    while (1) {
+        printf("Opção: ");
+        if (fgets(linha, TAM, stdin) == NULL) {
+            return 5; /* fim da entrada: encerra */
+        }
+ 
+        char *fim;
+        long valor = strtol(linha, &fim, 10);
+        int leu_numero = (fim != linha);
+ 
+        while (isspace((unsigned char)*fim)) {
+            fim++;
+        }
+ 
+        if (leu_numero && *fim == '\0' && valor >= 1 && valor <= 5) {
+            return (int)valor;
+        }
+        printf("Erro: opção inválida. Digite um número inteiro entre 1 e 5.\n");
+    }
+}
+ 
+/* Lê um número (inteiro ou decimal) e repete até a entrada ser válida. */
+double ler_numero(const char *mensagem) {
+    char linha[TAM];
+ 
+    while (1) {
+        printf("%s", mensagem);
+        if (fgets(linha, TAM, stdin) == NULL) {
+            exit(0);
+        }
+ 
+        char *fim;
+        double valor = strtod(linha, &fim);
+        int leu_numero = (fim != linha);
+ 
+        while (isspace((unsigned char)*fim)) {
+            fim++;
+        }
+ 
+        if (leu_numero && *fim == '\0') {
+            return valor;
+        }
+        printf("Erro: entrada inválida. Digite um número.\n");
+    }
+}
+ 
+/* Pergunta se o usuário quer continuar. Retorna 1 para 's' e 0 para 'n'. */
+int perguntar_outra_operacao(void) {
+    char linha[TAM];
+ 
+    while (1) {
+        printf("Deseja realizar outra operação? (s/n): ");
+        if (fgets(linha, TAM, stdin) == NULL) {
+            return 0;
+        }
+ 
+        linha[strcspn(linha, "\r\n")] = '\0';
+ 
+        if (strlen(linha) == 1) {
+            char r = (char)tolower((unsigned char)linha[0]);
+            if (r == 's') return 1;
+            if (r == 'n') return 0;
+        }
+        printf("Resposta inválida. Por favor, digite 's' para sim ou 'n' para não.\n");
+    }
+}
+ 
+int main(void) {
+    int continuar = 1;
+ 
+    while (continuar) {
+        exibir_menu();
+        int opcao = ler_opcao();
+ 
+        if (opcao == 5) {
+            break;
+        }
+ 
+        double a = ler_numero("Digite o primeiro número: ");
+        double b = ler_numero("Digite o segundo número: ");
+ 
+        switch (opcao) {
+            case 1:
+                printf("Resultado: %g + %g = %g\n", a, b, a + b);
+                break;
+            case 2:
+                printf("Resultado: %g - %g = %g\n", a, b, a - b);
+                break;
+            case 3:
+                printf("Resultado: %g * %g = %g\n", a, b, a * b);
+                break;
+            case 4:
+                if (b == 0) {
+                    printf("Erro: Divisão por zero não é permitida.\n");
+                } else {
+                    printf("Resultado: %g / %g = %g\n", a, b, a / b);
+                }
+                break;
+        }
+ 
+        continuar = perguntar_outra_operacao();
+    }
+ 
+    printf("Obrigado por usar a calculadora! Até a próxima.\n");
+    return 0;
+}
